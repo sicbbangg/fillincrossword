@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fill-in Crossword Generater</title>
+    <title>크로스워드 생성기</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-       @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Kantumruy+Pro:wght@400;500;700&display=swap'); /* Noto Sans KR과 Kantumruy Pro 폰트 (미디엄 포함) 모두 가져오기 */
+       @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap'); /* Noto Sans KR과 Funnel Sans 폰트 모두 가져오기 */
 
         body {
-            font-family: 'Kantumruy Pro', 'Noto Sans KR', sans-serif; /* 영어는 Kantumruy Pro, 한글은 Noto Sans KR 사용 */
-            letter-spacing: -0.03em; /* 한글 폰트 자간 미세 조정 (더 줄임) */
+            font-family: 'Funnel Sans', 'Noto Sans KR', sans-serif; /* 영어는 Funnel Sans, 한글은 Noto Sans KR 사용 */
+            letter-spacing: -0.03em; /* 한글 폰트 자간 미세 조정 */
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
-            background: #e0f2f7; /* 배경을 연한 하늘색 단색으로 변경 */
+            padding: 50px;
+            background: #F1F6F9; /* 배경을 쿨그레이 단색으로 변경 */
             min-height: 100vh;
             color: #333;
             font-weight: 400; /* 기본 폰트 굵기를 400(normal)로 명시 */
@@ -22,20 +22,20 @@
         
         .container {
             background: white;
-            border-radius: 15px;
-            padding: 30px;
-            /* box-shadow: 0 10px 30px rgba(0,0,0,0.2); 그림자 제거 */
+            border-radius: 40px;
+            padding: 60px;
         }
         
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 30px;
+            margin-bottom: 50px;
             font-size: 2.5em;
-            /* h1 텍스트 그라데이션 제거, 단색으로 변경 */
+            font-weight: 600;
+            letter-spacing: -0.03em;
             background: none; 
-            -webkit-background-clip: unset; /* 클립 속성 제거 */
-            -webkit-text-fill-color: #4a4a4a; /* 텍스트 색상 단색으로 변경 */
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: #2a69ac;
         }
         
         .controls {
@@ -48,23 +48,37 @@
         }
         
         button {
-            padding: 12px 24px;
+            padding: 10px 22px; 
             border: none;
-            border-radius: 8px;
+            border-radius: 14px; /* 버튼 모서리를 더 둥글게 변경 */
             font-size: 16px;
-            font-weight: bold; /* 버튼 굵기 유지 */
-            text-transform: uppercase;
-            letter-spacing: -0.03em; /* 버튼 속 한글 자간도 똑같이 적용 */
+            font-weight: 500; 
+            text-transform: none; /* 대문자 변환 제거 (원래 텍스트 그대로 사용) */
+            letter-spacing: -0.03em; 
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #667eea; /* 버튼 배경색을 단색으로 변경 (기존 그라데이션의 시작색) */
+            background: #a0aec0; /* 쿨그레이 색상으로 변경 */
             color: white;
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3); /* 은은한 그림자 추가 */
+            box-shadow: none; 
+            font-family: 'Noto Sans KR', sans-serif; 
+        }
+
+        /* 개별 버튼 색상 및 텍스트 오버라이드 */
+        #generateButton { /* 퍼즐 생성 버튼 ID 추가 */
+            background-color: #bee3f8; /* 연한 파란색 배경 */
+            color: #2a69ac; /* 짙은 파란색 텍스트 */
+            border:  none; /* 연한 파란색 테두리 */
+        }
+
+        #downloadBtn { /* PDF 저장 버튼 ID 유지 */
+            background-color: #bee3f8; /* 연한 파란색 배경 */
+            color: #2a69ac; /* 짙은 파란색 텍스트 */
+            border: none; /* 연한 파란색 테두리 */
         }
         
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.5);
+            box-shadow: none; 
         }
         
         button:disabled {
@@ -87,19 +101,21 @@
         
         .crossword-container {
             display: flex;
-            gap: 30px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-            justify-content: center; /* 내용을 가로로 중앙 정렬 */
+            flex-direction: column; 
+            gap: 30px; 
+            margin-top: 50px;
         }
         
         .grid-container {
-            flex: 1;
-            min-width: 320px; /* 반응형을 위한 최소 너비 조정 */
-            max-width: 450px; /* 그리드 컨테이너의 최대 너비 (칸 크기 조절의 기준) */
+            position: relative; 
+            flex: none; 
+            min-width: 320px;
+            max-width: 450px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin: 0 auto; 
+            padding-bottom: 20px; 
         }
         
         .crossword-grid {
@@ -108,68 +124,69 @@
             background-color: #333;
             border: 2px solid #333;
             margin-bottom: 20px;
-            width: fit-content; /* 그리드 내용에 맞게 너비 조정 */
+            width: fit-content;
         }
         
         .cell {
-            background-color: #e0e7ee; /* 셀 배경색을 더 밝게 */
+            background-color: #e0e7ee;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px; /* 더 작은 셀에 맞게 글꼴 크기 조정 */
-            font-weight: 500; /* 칸의 글자 굵기를 Medium (500)으로 조정 */
+            font-size: 14px; 
+            font-weight: 500; 
             position: relative;
-            border: 1px solid #a0aec0; /* 셀 테두리를 더 부드러운 회색으로 */
-            box-sizing: border-box; /* 패딩/테두리를 셀 너비/높이에 포함 */
-            box-shadow: inset 0 0 3px rgba(0,0,0,0.05); /* 은은한 내부 그림자 추가 */
+            border: 1px solid #a0aec0;
+            box-sizing: border-box;
+            box-shadow: inset 0 0 3px rgba(0,0,0,0.05);
+            letter-spacing: 0.02em; 
         }
         
         .cell.black {
             background-color: #333;
-            border: none; /* 검은 셀에는 테두리 없음 */
-            box-shadow: none; /* 검은 셀에는 그림자 없음 */
+            border: none;
+            box-shadow: none;
         }
         
         .cell .number {
             position: absolute;
             top: 1px;
             left: 1px;
-            font-size: 8px; /* 숫자 글꼴 크기 조정 */
+            font-size: 8px;
             color: #666;
         }
         
         .words-section {
-            flex: 1;
-            min-width: 280px; /* 최소 너비 조정 */
-            max-width: 400px;
-            padding-left: 10px; /* 패딩 추가 */
+            flex: none; 
+            min-width: 280px;
+            width: 100%; 
+            padding-left: 0; 
+            text-align: left; 
+            box-sizing: border-box; 
         }
         
-        .words-section h3 {
-            color: #333;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 5px;
-            margin-bottom: 15px;
-        }
         
         .word-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* 단어에 맞게 minmax 조정 */
-            gap: 8px; /* 단어 간 간격 줄임 */
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: flex-start; 
+            gap: 8px;
             padding: 0;
             list-style: none;
+            width: 100%; 
+            margin: 0; 
         }
         
         .word-list li {
             background: #f8f9fa;
-            padding: 6px 10px; /* 패딩 조정 */
+            padding: 6px 10px;
             border-radius: 6px;
             text-align: center;
-            font-weight: 500; /* 단어 목록의 글자 굵기를 Medium (500)으로 조정 */
-            border: 2px solid #e9ecef;
+            font-weight: 500; 
+            border: none; 
             transition: all 0.2s ease;
-            font-size: 0.9em; /* 단어 글꼴을 약간 작게 */
-            overflow-wrap: break-word; /* 긴 단어 줄 바꿈 */
+            font-size: 0.9em;
+            overflow-wrap: break-word;
+            letter-spacing: 0.02em; 
         }
         
         .word-list li:hover {
@@ -179,42 +196,23 @@
         
         .loading {
             text-align: center;
-            color: #667eea;
+            color: #2a69ac;
             font-size: 18px;
-            margin: 20px 0;
-            font-weight: bold;
+            margin: 30px 0;
+            font-weight: 500;
         }
         
-        .toggle-buttons {
-            text-align: center;
-            margin: 15px 0 25px 0; /* 여백 조정 */
-        }
-        
-        .toggle-buttons button {
-            margin: 0 8px; /* 여백 조정 */
-            padding: 10px 18px; /* 패딩 조정 */
-            font-size: 14px;
-            background: #28a745; /* 토글 버튼 배경색을 단색으로 변경 */
-            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
-            font-weight: bold; /* 토글 버튼 굵기 유지 */
-            letter-spacing: -0.03em; /* 버튼 속 한글 자간도 똑같이 적용 */
-        }
-
-        .toggle-buttons button:hover {
-            box-shadow: 0 6px 18px rgba(40, 167, 69, 0.5);
-        }
-
         /* 모달 스타일 */
         .modal {
-            display: none; /* 기본적으로 숨김 */
-            position: fixed; /* 제자리에 고정 */
-            z-index: 1000; /* 맨 위 */
+            display: none;
+            position: fixed;
+            z-index: 1000;
             left: 0;
             top: 0;
-            width: 100%; /* 전체 너비 */
-            height: 100%; /* 전체 높이 */
-            overflow: auto; /* 필요시 스크롤 가능 */
-            background-color: rgba(0,0,0,0.6); /* 불투명도 있는 검은색 */
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -226,7 +224,7 @@
             padding: 30px;
             border: 1px solid #888;
             border-radius: 15px;
-            width: 80%; /* 반응형 */
+            width: 80%;
             max-width: 400px;
             text-align: center;
             box-shadow: 0 8px 16px rgba(0,0,0,0.3);
@@ -244,7 +242,7 @@
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
-            position: absolute; /* 모달 내용에 상대적으로 위치 */
+            position: absolute;
             top: 10px;
             right: 15px;
         }
@@ -266,41 +264,129 @@
             text-align: center;
             margin-top: 40px;
             padding: 15px;
-            font-size: 0.85em; /* 폰트 사이즈 살짝 줄임 */
-            color: #777; /* 부드러운 회색 텍스트 */
+            font-size: 0.85em;
+            color: #777;
             padding-top: 25px; 
         }
 
         .footer span {
-            font-weight: bold; /* 이름 부분만 굵게 */
-            color: #555; /* 이름 색상을 약간 더 진하게 */
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* 토글 스위치 스타일 */
+        .toggle-switch-container {
+            position: absolute;
+            bottom: 0px; 
+            right: 0px; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+            background: white; 
+            padding: 0; 
+            border-radius: 8px;
+            box-shadow: none; 
+        }
+
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 40px;
+          height: 24px;
+        }
+
+        .switch input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: #ccc; 
+          -webkit-transition: .4s;
+          transition: .4s;
+        }
+
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 16px;
+          width: 16px;
+          left: 4px;
+          bottom: 4px;
+          background-color: white;
+          -webkit-transition: .4s;
+          transition: .4s;
+        }
+
+        input:checked + .slider {
+          background-color: #a0aec0; /* 켜진 상태 색상 (버튼과 동일) */
+        }
+
+        input:focus + .slider {
+          box-shadow: 0 0 1px #a0aec0;
+        }
+
+        input:checked + .slider:before {
+          -webkit-transform: translateX(16px);
+          -ms-transform: translateX(16px);
+          transform: translateX(16px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+          border-radius: 24px;
+        }
+
+        .slider.round:before {
+          border-radius: 50%;
+        }
+
+        .toggle-label {
+            font-family: 'Noto Sans KR', sans-serif; /* 한글 폰트 적용 */
+            font-size: 0.9em;
+            color: #333;
+            font-weight: 500;
+            letter-spacing: -0.03em; /* 한글 자간 통일 */
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Fill-in Crossword Generater</h1>
+        <h1>크로스워드 생성기</h1>
         
         <div class="controls">
-            <button onclick="generateCrossword()">다시 생성</button>
-            <button onclick="downloadPDF()" id="downloadBtn" disabled>PDF로 저장</button>
+            <button onclick="generateCrossword()" id="generateButton">다시 생성</button>
+            <button onclick="downloadPDF()" id="downloadBtn" disabled>PDF 저장</button>
+            <!-- 정답 토글 버튼은 아래 grid-container 안으로 이동 -->
         </div>
         
         <div id="loading" class="loading" style="display: none;">
-            크로스워드를 생성하고 있습니다 ⏳
+            크로스워드 생성 중 ⏳
         </div>
         
         <div class="crossword-container" id="crosswordContainer" style="display: none;">
             <div class="grid-container">
-                <div class="toggle-buttons">
-                    <button onclick="showEmptyGrid()">빈 격자 보기</button>
-                    <button onclick="showAnswerGrid()">정답 보기</button>
-                </div>
                 <div id="crosswordGrid" class="crossword-grid"></div>
+                <!-- 정답 토글 스위치 -->
+                <div class="toggle-switch-container">
+                    <span id="toggleLabel" class="toggle-label">정답 보기</span> <!-- 라벨을 스위치 왼쪽으로 이동 -->
+                    <label class="switch">
+                        <input type="checkbox" id="answerToggleCheckbox" onchange="toggleAnswerView()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
             </div>
             
             <div class="words-section">
-                <h3>🔤 사용할 단어들</h3>
+                <h3></h3>
                 <ul id="wordList" class="word-list"></ul>
             </div>
         </div>
@@ -415,6 +501,13 @@
             document.getElementById('crosswordContainer').style.display = 'none';
             document.getElementById('downloadBtn').disabled = true;
             
+            // 토글 스위치 비활성화 및 초기화
+            const toggleCheckbox = document.getElementById('answerToggleCheckbox');
+            const toggleLabel = document.getElementById('toggleLabel');
+            toggleCheckbox.disabled = true;
+            toggleCheckbox.checked = false; // 항상 비활성화 상태로 시작
+            toggleLabel.textContent = '정답 보기';
+            
             // 컨테이너를 먼저 보이게 하여 offsetWidth가 올바르게 계산되도록 함
             document.getElementById('crosswordContainer').style.display = 'flex'; 
 
@@ -422,19 +515,25 @@
                 const result = createFillInCrossword(GRID_SIZE);
                 
                 // 충분한 단어가 배치되었는지 확인
-                if (result && result.words.length > 5) {
+                if (result && result.words.length > 10) { // 최소 10개 이상 단어가 배치되어야 성공으로 간주
                     currentGrid = result.emptyGrid;
                     answerGrid = result.answerGrid;
                     currentWords = result.words;
-                    showingAnswer = false;
-                    displayCrossword(currentGrid, currentWords, GRID_SIZE);
+                    showingAnswer = false; // 퍼즐 뷰로 시작
+                    displayCrossword(currentGrid, currentWords, GRID_SIZE); // 빈 그리드 표시
                     document.getElementById('downloadBtn').disabled = false;
+                    toggleCheckbox.disabled = false; // 토글 스위치 활성화
                     
                     // 퍼즐 생성 후 기본적으로 힌트 글자 하나 공개
                     revealHintLetterInternal(); 
 
                 } else {
+                    // 생성 실패 시 모달 메시지 표시
                     showModal('크로스워드 생성에 실패했습니다. (충분한 단어가 배치되지 않음) 다시 시도해주세요.');
+                    document.getElementById('crosswordContainer').style.display = 'none'; // 실패 시 컨테이너 숨김
+                    toggleCheckbox.disabled = true; // 토글 스위치 비활성화
+                    toggleCheckbox.checked = false;
+                    toggleLabel.textContent = '정답 보기';
                 }
                 
                 document.getElementById('loading').style.display = 'none';
@@ -471,7 +570,7 @@
             }
 
             // 2. 남은 단어들을 교차점을 찾아 배치 시도 (목표 개수까지)
-            const targetWordCount = 25; // 퍼즐에 배치할 목표 단어 개수
+            const targetWordCount = 40; 
 
             for (const word of shuffledAndFilteredWords) { // 남은 섞인 단어들을 순회
                 if (usedWords.length >= targetWordCount) break; // 목표 개수에 도달하면 중단
@@ -547,53 +646,90 @@
 
         // 단어를 가로로 배치할 수 있는지 확인하는 함수
         function canPlaceHorizontal(grid, word, row, col, size) {
-            // 경계 확인
+            // 1. 경계 확인
             if (col < 0 || col + word.length > size || row < 0 || row >= size) return false;
             
-            // 앞뒤 셀이 비어 있는지 확인
-            if (col > 0 && grid[row][col - 1] !== '') return false;
-            if (col + word.length < size && grid[row][col + word.length] !== '') return false;
-            
-            for (let i = 0; i < word.length; i++) {
-                const currentCell = grid[row][col + i];
-                // 셀이 다른 글자로 채워져 있거나 글자가 있어야 할 검은 셀인 경우
-                if (currentCell !== '' && currentCell !== word[i]) {
-                    return false;
+            // 2. 단어 시작/끝 부분에 다른 단어가 붙는지 확인 (Edge conflicts)
+            // (교차점은 허용됨. 이는 아래 3번에서 처리)
+            if (col > 0 && grid[row][col - 1] !== '') { // 바로 왼쪽 칸이 비어있지 않다면
+                // 이 칸이 배치하려는 단어의 일부(교차점)가 아니라면 false (중복 방지)
+                if (grid[row][col-1] !== word[0]) { // 첫 글자와 왼쪽 칸이 일치하지 않으면
+                     return false; 
                 }
-                
-                // 현재 셀이 비어 있으면 위아래 셀에 충돌하는 글자가 있는지 확인
-                if (currentCell === '') {
-                    if (row > 0 && grid[row - 1][col + i] !== '') return false;
-                    if (row < size - 1 && grid[row + 1][col + i] !== '') return false;
+            }
+            if (col + word.length < size && grid[row][col + word.length] !== '') { // 바로 오른쪽 칸이 비어있지 않다면
+                // 이 칸이 배치하려는 단어의 일부(교차점)가 아니라면 false (중복 방지)
+                if (grid[row][col + word.length] !== word[word.length - 1]) { // 마지막 글자와 오른쪽 칸이 일치하지 않으면
+                    return false;
                 }
             }
             
+            // 3. 각 셀을 순회하며 충돌 검사 (Conflict checking and intersections)
+            for (let i = 0; i < word.length; i++) {
+                const currentGridChar = grid[row][col + i]; // 현재 그리드의 해당 셀 글자
+                const newWordChar = word[i]; // 배치하려는 단어의 해당 글자
+
+                // 셀이 비어있지 않은데, 배치하려는 글자와 다르다면 충돌
+                if (currentGridChar !== '' && currentGridChar !== newWordChar) {
+                    return false;
+                }
+                
+                // 4. 수직 방향 인접 셀 검사 (Perpendicular adjacency check)
+                // 현재 셀이 비어 있으면 위아래 셀에 다른 글자가 없는지 확인 (L-자 형태 방지)
+                if (currentGridChar === '') { 
+                    // 위쪽 셀 확인
+                    if (row > 0 && grid[row - 1][col + i] !== '') {
+                        return false;
+                    }
+                    // 아래쪽 셀 확인
+                    if (row < size - 1 && grid[row + 1][col + i] !== '') {
+                        return false;
+                    }
+                }
+            }
             return true;
         }
 
         // 단어를 세로로 배치할 수 있는지 확인하는 함수
         function canPlaceVertical(grid, word, row, col, size) {
-            // 경계 확인
+            // 1. 경계 확인
             if (row < 0 || row + word.length > size || col < 0 || col >= size) return false;
             
-            // 위아래 셀이 비어 있는지 확인
-            if (row > 0 && grid[row - 1][col] !== '') return false;
-            if (row + word.length < size && grid[row + word.length][col] !== '') return false;
-            
-            for (let i = 0; i < word.length; i++) {
-                const currentCell = grid[row + i][col];
-                // 셀이 다른 글자로 채워져 있거나 글자가 있어야 할 검은 셀인 경우
-                if (currentCell !== '' && currentCell !== word[i]) {
+            // 2. 단어 위/아래 부분에 다른 단어가 붙는지 확인
+            if (row > 0 && grid[row - 1][col] !== '') { // 바로 위 칸이 비어있지 않다면
+                // 이 칸이 배치하려는 단어의 일부(교차점)가 아니라면 false (중복 방지)
+                if (grid[row - 1][col] !== word[0]) {
                     return false;
                 }
-                
-                // 현재 셀이 비어 있으면 좌우 셀에 충돌하는 글자가 있는지 확인
-                if (currentCell === '') {
-                    if (col > 0 && grid[row + i][col - 1] !== '') return false;
-                    if (col < size - 1 && grid[row + i][col + 1] !== '') return false;
+            }
+            if (row + word.length < size && grid[row + word.length][col] !== '') { // 바로 아래 칸이 비어있지 않다면
+                // 이 칸이 배치하려는 단어의 일부(교차점)가 아니라면 false (중복 방지)
+                if (grid[row + word.length][col] !== word[word.length - 1]) {
+                    return false;
                 }
             }
             
+            // 3. 각 셀을 순회하며 충돌 검사
+            for (let i = 0; i < word.length; i++) {
+                const currentGridChar = grid[row + i][col];
+                const newWordChar = word[i];
+
+                if (currentGridChar !== '' && currentGridChar !== newWordChar) {
+                    return false;
+                }
+                
+                // 4. 수평 방향 인접 셀 검사
+                if (currentGridChar === '') { 
+                    // 왼쪽 셀 확인
+                    if (col > 0 && grid[row + i][col - 1] !== '') {
+                        return false;
+                    }
+                    // 오른쪽 셀 확인
+                    if (col < size - 1 && grid[row + i][col + 1] !== '') {
+                        return false;
+                    }
+                }
+            }
             return true;
         }
 
@@ -643,24 +779,29 @@
             document.getElementById('wordList').innerHTML = words.map(word => `<li>${word}</li>`).join('');
         }
 
-        // 빈 격자를 보여주는 함수
-        function showEmptyGrid() {
-            if (currentGrid) {
-                showingAnswer = false;
-                displayCrossword(currentGrid, currentWords, GRID_SIZE);
-            }
-        }
+        // 정답 보기/끄기 버튼 토글 함수
+        function toggleAnswerView() {
+            const toggleCheckbox = document.getElementById('answerToggleCheckbox');
+            const toggleLabel = document.getElementById('toggleLabel');
 
-        // 정답 격자를 보여주는 함수
-        function showAnswerGrid() {
-            if (answerGrid) {
-                showingAnswer = true;
+            if (!currentGrid || !answerGrid) {
+                toggleCheckbox.checked = false; // 퍼즐이 없으면 체크박스 초기화
+                toggleLabel.textContent = '정답 보기';
+                return;
+            }
+
+            showingAnswer = toggleCheckbox.checked; // 체크박스 상태를 따라감
+
+            if (showingAnswer) {
                 displayCrossword(answerGrid, currentWords, GRID_SIZE);
+                toggleLabel.textContent = '정답 끄기';
+            } else {
+                displayCrossword(currentGrid, currentWords, GRID_SIZE);
+                toggleLabel.textContent = '정답 보기';
             }
         }
 
         // 힌트 글자 하나를 공개하는 함수
-        // 이 함수는 '힌트 보기' 버튼이 제거되었으므로 내부적으로만 사용됩니다.
         function revealHintLetterInternal() {
             const emptyPlayableCells = []; // 빈 칸의 좌표를 저장할 배열
 
@@ -674,8 +815,7 @@
             }
 
             if (emptyPlayableCells.length === 0) {
-                //showModal('더 이상 공개할 수 있는 빈 칸이 없습니다. 모든 글자가 채워졌거나, 더 이상 놓을 곳이 없습니다!');
-                return; // 모달 메시지는 버튼이 없으므로 주석 처리
+                return; // 더 이상 공개할 수 있는 빈 칸이 없으면 종료
             }
 
             // 무작위로 하나의 빈 칸 선택
@@ -684,7 +824,11 @@
 
             // 선택된 칸에 정답 글자 공개
             currentGrid[row][col] = answerGrid[row][col];
-            displayCrossword(currentGrid, currentWords, GRID_SIZE);
+            
+            // 현재 퍼즐 뷰를 보고 있을 때만 디스플레이를 업데이트
+            if (!showingAnswer) {
+                displayCrossword(currentGrid, currentWords, GRID_SIZE);
+            }
         }
 
 
