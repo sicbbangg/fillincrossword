@@ -14,7 +14,7 @@
             letter-spacing: -0.03em; /* 한글 폰트 자간 미세 조정 */
             max-width: 1200px;
             margin: 0 auto;
-            padding: 50px;
+            padding: 40px;
             background: #F1F6F9; /* 배경을 쿨그레이 단색으로 변경 */
             min-height: 100vh;
             color: #333;
@@ -24,14 +24,14 @@
         .container {
             background: white;
             border-radius: 40px;
-            padding: 60px;
+            padding: 30px;
         }
         
         h1 {
             font-family: 'Bagel Fat One', 'Noto Sans KR', sans-serif; /* H1 폰트를 Bagel Fat One으로 설정 */
             text-align: center;
             color: #DFF0FC;
-            margin-bottom: 70px;
+            margin-bottom: 40px;
             font-size: 60px;
             font-weight: 400;
             letter-spacing: 0em;
@@ -160,12 +160,12 @@
         .word-list {
             display: flex; 
             flex-wrap: wrap; 
-            justify-content: flex-start; 
+            justify-content: center; /* 단어 아이템들을 가로 가운데 정렬 */
             gap: 8px;
             padding: 0;
             list-style: none;
             width: 100%; 
-            margin: 0; 
+            margin: 0 auto; /* 리스트 자체를 중앙 정렬 */
         }
         
         .word-list li {
@@ -188,9 +188,9 @@
         
         .loading {
             text-align: center;
-            color: #2a69ac;
-            font-size: 18px;
-            margin: 30px 0;
+            color: #174374;
+            font-size: 16px;
+            margin: 60px 60px;
             font-weight: 500;
         }
         
@@ -355,7 +355,7 @@
         <h1>크로스워드 생성기</h1>
         
         <div class="controls">
-            <button onclick="generateCrossword()" id="generateButton">다시 생성</button>
+            <button onclick="generateCrossword()" id="generateButton">새 퍼즐</button>
             <button onclick="downloadPDF()" id="downloadBtn" disabled>PDF 저장</button>
             <!-- 정답 토글 버튼은 아래 grid-container 안으로 이동 -->
         </div>
