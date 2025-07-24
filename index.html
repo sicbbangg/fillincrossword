@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>크로스워드 생성기</title>
+    <title>크로스워드 퍼즐 생성기</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap'); /* Noto Sans KR과 Funnel Sans 폰트 모두 가져오기 */
@@ -14,7 +14,7 @@
             letter-spacing: -0.03em; /* 한글 폰트 자간 미세 조정 */
             max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 40px 80px 40px; /* 아래쪽 패딩을 80px로 늘림 */
+            padding: 80px; /* 아래쪽 패딩을 80px로 늘림 */
             background: #F1F6F9; /* 배경을 쿨그레이 단색으로 변경 */
             min-height: 100vh;
             color: #333;
@@ -24,17 +24,17 @@
         .container {
             background: white;
             border-radius: 40px;
-            padding: 40px 40px 80px 40px; /* 컨테이너의 아래쪽 패딩을 80px로 늘림 */
+            padding: 50px; /* 컨테이너의 아래쪽 패딩을 80px로 늘림 */
         }
         
         h1 {
-            font-family: 'Bagel Fat One', 'Noto Sans KR', sans-serif; /* H1 폰트를 Bagel Fat One으로 설정 */
+            font-family: 'Noto Sans KR', sans-serif;
             text-align: center;
             color: #DFF0FC;
             margin-bottom: 40px;
-            font-size: 60px;
-            font-weight: 400;
-            letter-spacing: 0em;
+            font-size: 40px;
+            font-weight: 600;
+            letter-spacing: -0.03em;
             background: none; 
             -webkit-background-clip: unset;
             -webkit-text-fill-color: #174374;
@@ -42,17 +42,17 @@
         
         .controls {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             margin-bottom: 20px;
             flex-wrap: wrap;
             align-items: center;
-            justify-content: center;
+            justify-content: left; /* 버튼들을 왼쪽으로 정렬 */
         }
         
         button {
-            padding: 14px 32px; 
+            padding: 12px 28px; /* 버튼 위아래 패딩 조정 */
             border: none;
-            border-radius: 16px; /* 버튼 모서리를 더 둥글게 변경 */
+            border-radius: 12px; /* 버튼 모서리를 더 둥글게 변경 */
             font-size: 16px;
             font-weight: 500; 
             text-transform: none; /* 대문자 변환 제거 (원래 텍스트 그대로 사용) */
@@ -94,8 +94,8 @@
         .crossword-container {
             display: flex;
             flex-direction: row; /* 가로로 배치 */
-            gap: 60px; /* 간격 더 넓히기 */
-            margin-top: 50px;
+            gap: 50px; /* 간격 더 넓히기 */
+            margin-top: 20px;
             flex-wrap: wrap; /* 화면이 좁아지면 줄 바꿈 */
             justify-content: center; /* 가운데 정렬 유지 */
             align-items: flex-start; /* 상단 정렬 */
@@ -105,7 +105,7 @@
             position: relative; 
             flex: none; /* 유연하게 확장하지 않고 고정된 너비 유지 */
             min-width: 320px;
-            max-width: 380px; /* 격자 최대 너비 */
+            max-width: 400px; /* 격자 최대 너비 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -153,7 +153,7 @@
         .words-section {
             flex: 1; /* 남은 공간을 채우도록 확장 */
             min-width: 280px; /* 최소 너비 */
-            max-width: 400px; /* 단어 섹션의 최대 너비 제한 */
+            max-width: 550px; /* 단어 섹션의 최대 너비를 더 늘림 */
             padding-left: 0; 
             text-align: left; 
             box-sizing: border-box; 
@@ -173,7 +173,7 @@
             display: flex; 
             flex-wrap: wrap; 
             justify-content: flex-start; /* 단어 아이템들을 왼쪽 정렬 */
-            gap: 12px; /* 단어 간격 10px로 변경 */
+            gap: 12px; /* 단어 간격 유지 */
             padding: 0;
             list-style: none;
             width: 100%; 
@@ -182,7 +182,7 @@
         
         .word-list li {
             background: #F4F4F5;
-            padding: 6px 10px;
+            padding: 8px 12px; /* 가로 패딩을 늘려 단어를 더 길게 보이도록 조정 */
             border-radius: 6px;
             text-align: center;
             font-weight: 500; 
@@ -364,7 +364,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>크로스워드 생성기</h1>
+        <h1>크로스워드 퍼즐 생성기</h1>
         
         <div class="controls">
             <button onclick="generateCrossword()" id="generateButton">새 퍼즐</button>
@@ -753,7 +753,7 @@
         // 크로스워드를 HTML에 표시하는 함수
         function displayCrossword(grid, words, size) {
             const gridContainer = document.getElementById('crosswordGrid');
-            const gridContainerMaxWidth = 380; // CSS에 설정된 .grid-container의 max-width
+            const gridContainerMaxWidth = 400; // CSS에 설정된 .grid-container의 max-width
             const cellSize = gridContainerMaxWidth / size; 
             
             gridContainer.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
