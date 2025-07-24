@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fill-in 크로스워드 퍼즐 생성기</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Inter 폰트로 통일 */
+
+        body {
+            font-family: 'Inter', sans-serif; /* Inter 폰트 적용 */
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3); /* 은은한 그림자 추가 */
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.5);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .info {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            color: #555;
+            font-size: 16px;
+            box-shadow: inset 0 1px 5px rgba(0,0,0,0.1);
+        }
+        
+        .crossword-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center; /* 내용을 가로로 중앙 정렬 */
+        }
+        
+        .grid-container {
+            flex: 1;
+            min-width: 320px; /* 반응형을 위한 최소 너비 조정 */
+            max-width: 450px; /* 그리드 컨테이너의 최대 너비 (칸 크기 조절의 기준) */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .crossword-grid {
+            display: grid;
+            gap: 1px;
+            background-color: #333;
+            border: 2px solid #333;
+            margin-bottom: 20px;
+            width: fit-content; /* 그리드 내용에 맞게 너비 조정 */
+        }
+        
+        .cell {
+            background-color: #e0e7ee; /* 셀 배경색을 더 밝게 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px; /* 더 작은 셀에 맞게 글꼴 크기 조정 */
+            font-weight: bold;
+            position: relative;
+            border: 1px solid #a0aec0; /* 셀 테두리를 더 부드러운 회색으로 */
+            box-sizing: border-box; /* 패딩/테두리를 셀 너비/높이에 포함 */
+            box-shadow: inset 0 0 3px rgba(0,0,0,0.05); /* 은은한 내부 그림자 추가 */
+        }
+        
+        .cell.black {
+            background-color: #333;
+            border: none; /* 검은 셀에는 테두리 없음 */
+            box-shadow: none; /* 검은 셀에는 그림자 없음 */
+        }
+        
+        .cell .number {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            font-size: 8px; /* 숫자 글꼴 크기 조정 */
+            color: #666;
+        }
+        
+        .words-section {
+            flex: 1;
+            min-width: 280px; /* 최소 너비 조정 */
+            max-width: 400px;
+            padding-left: 10px; /* 패딩 추가 */
+        }
+        
+        .words-section h3 {
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .word-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* 단어에 맞게 minmax 조정 */
+            gap: 8px; /* 단어 간 간격 줄임 */
+            padding: 0;
+            list-style: none;
+        }
+        
+        .word-list li {
+            background: #f8f9fa;
+            padding: 6px 10px; /* 패딩 조정 */
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid #e9ecef;
+            transition: all 0.2s ease;
+            font-size: 0.9em; /* 단어 글꼴을 약간 작게 */
+            overflow-wrap: break-word; /* 긴 단어 줄 바꿈 */
+        }
+        
+        .word-list li:hover {
+            background: #e3f2fd;
+            border-color: #667eea;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-size: 18px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .toggle-buttons {
+            text-align: center;
+            margin: 15px 0 25px 0; /* 여백 조정 */
+        }
+        
+        .toggle-buttons button {
+            margin: 0 8px; /* 여백 조정 */
+            padding: 10px 18px; /* 패딩 조정 */
+            font-size: 14px;
+            background: linear-gradient(45deg, #28a745, #20c997); /* 토글 버튼 색상 변경 */
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .toggle-buttons button:hover {
+            box-shadow: 0 6px 18px rgba(40, 167, 69, 0.5);
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none; /* 기본적으로 숨김 */
+            position: fixed; /* 제자리에 고정 */
+            z-index: 1000; /* 맨 위 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 전체 너비 */
+            height: 100%; /* 전체 높이 */
+            overflow: auto; /* 필요시 스크롤 가능 */
+            background-color: rgba(0,0,0,0.6); /* 불투명도 있는 검은색 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #888;
+            border-radius: 15px;
+            width: 80%; /* 반응형 */
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute; /* 모달 내용에 상대적으로 위치 */
+            top: 10px;
+            right: 15px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-message {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 Fill-in 크로스워드 퍼즐 생성기</h1>
+        
+        <div class="controls">
+            <button onclick="generateCrossword()">새 크로스워드 생성</button>
+            <button onclick="downloadPDF()" id="downloadBtn" disabled>PDF로 저장</button>
+        </div>
+        
+        <div class="info">
+            <strong>🎯 Fill-in 크로스워드:</strong> 아래 단어들을 보고 빈 격자에 끼워맞춰 보세요!
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            크로스워드를 생성하고 있습니다... ⏳
+        </div>
+        
+        <div class="crossword-container" id="crosswordContainer" style="display: none;">
+            <div class="grid-container">
+                <div class="toggle-buttons">
+                    <button onclick="showEmptyGrid()">빈 격자 보기</button>
+                    <button onclick="showAnswerGrid()">정답 보기</button>
+                </div>
+                <div id="crosswordGrid" class="crossword-grid"></div>
+            </div>
+            
+            <div class="words-section">
+                <h3>🔤 사용할 단어들</h3>
+                <ul id="wordList" class="word-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Alerts -->
+    <div id="myModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <p id="modalMessage" class="modal-message"></p>
+            <button onclick="closeModal()">확인</button>
+        </div>
+    </div>
+
+    <script>
+        // Challenging word database (intermediate to advanced words)
+        // 도전적인 단어 데이터베이스 (중급~고급 단어 중심)
+        const wordDatabase = [
+            // 3-4 letter simple words (3-4 글자 간단한 단어)
+            'CAT', 'DOG', 'SUN', 'MOON', 'RUN', 'JUMP', 'BLUE', 'RED', 'FISH', 'BIRD',
+            'TREE', 'CAR', 'BOOK', 'OPEN', 'CLOSE', 'DAY', 'NIGHT', 'READ', 'SING', 'PLAY',
+            'FOOD', 'WATER', 'FIRE', 'HOME', 'LOVE', 'DARK', 'LIGHT', 'STAR', 'WALK', 'TALK',
+            'GAME', 'TOWN', 'CITY', 'ROAD', 'GATE', 'HOPE', 'FREE', 'CUTE', 'LOUD', 'QUIZ',
+            'LAMP', 'MAP', 'BAG', 'BOX', 'COIN', 'CUP', 'EAR', 'EYE', 'FARM', 'GIFT',
+            'HAT', 'ICE', 'JET', 'KEY', 'LION', 'MILK', 'NEST', 'OWL', 'PIG', 'RAIN',
+            'ROSE', 'SALT', 'TAPE', 'VASE', 'WIND', 'YARN', 'ZINC', 'ANT', 'BUS', 'DISH',
+            'EGG', 'FAN', 'FOX', 'GOAT', 'HEN', 'INK', 'JAM', 'KITE', 'LEG', 'MAT',
+            'NUT', 'OAR', 'PEN', 'QUILL', 'RING', 'SODA', 'TENT', 'VAN', 'WEB', 'YOGA',
+            'ZOO', 'BEAR', 'CAKE', 'DICE', 'DUCK', 'FISH', 'FROG', 'GUM', 'HORN', 'IRON',
+            'JUICE', 'KICK', 'LAKE', 'MINT', 'MOTH', 'NAIL', 'OVAL', 'PUMP', 'QUIT', 'ROOT',
+            'SOAP', 'TAXI', 'TRAY', 'VOTE', 'WOLF', 'YAWN', 'ZERO',
+            
+            // 5-7 letter intermediate words (5-7 글자 중급 단어)
+            'APPLE', 'BRAVE', 'CLOUDS', 'DREAM', 'EAGLE', 'FANCY', 'GRAPE', 'HAPPY', 'IDEAL', 'JOLLY',
+            'KITES', 'LIGHT', 'MAGIC', 'NIGHT', 'OCEAN', 'PEACE', 'QUIET', 'RIVER', 'STORY', 'TIGER',
+            'UNION', 'VIOLET', 'WALRUS', 'XENON', 'YIELD', 'ZONES', 'AMONG', 'BEACH', 'CRANE', 'DAISY',
+            'ENJOY', 'FROGS', 'GIANT', 'HASTY', 'IMAGE', 'JEWEL', 'KNEEL', 'LEMON', 'MOOSE', 'NOBLE',
+            'OASIS', 'PLUTO', 'QUICK', 'ROBIN', 'SNAIL', 'TRUTH', 'ULTRA', 'VITAL', 'WAVES', 'YOUTH',
+            'ZEBRA', 'QUEST', 'BLAZE', 'FJORD', 'WALTZ', 'JUDGE', 'PROXY', 'QUOTE', 'WHISK', 'BRISK',
+            'QUILT', 'YACHT', 'SPHINX', 'RHYTHM', 'GALAXY', 'FROZEN', 'SYNTAX', 'OXYGEN', 'ENZYME', 'MATRIX',
+            'FABRIC', 'WISDOM', 'SEQUEL', 'KNIGHT', 'VOYAGE', 'BEACON', 'ENIGMA', 'TEMPLE', 'SPHERE', 'BRONZE',
+            'AUTUMN', 'MARBLE', 'JUNGLE', 'FLAVOR', 'GENIUS', 'PORTAL', 'VERTEX', 'ORCHID', 'MAGNET', 'CORPUS',
+            
+            // 8-10 letter upper-intermediate words (8-10 글자 중상급 단어)
+            'ABSTRACT', 'BEHAVIOR', 'COMPUTER', 'DIALOGUE', 'EXCHANGE', 'FUNCTION', 'GRAPHICS', 'HOSPITAL',
+            'IDENTITY', 'JEALOUSY', 'KEYBOARD', 'LANGUAGE', 'MAGNETIC', 'NEGATIVE', 'OBJECTIVE', 'PAVILION',
+            'QUANTITY', 'RESEARCH', 'SANDWICH', 'TRIANGLE', 'UMBRELLA', 'VELOCITY', 'WORKSHOP', 'XYLOPHONE',
+            'YEARBOOK', 'ZEPPELIN', 'BACTERIA', 'CAMPAIGN', 'DESIGNER', 'EQUATION', 'FESTIVAL',
+            'GRACEFUL', 'HANDBOOK', 'IDENTIFY', 'JUNCTION', 'KANGAROO', 'LANDMARK', 'MAGAZINE', 'NOTEBOOK',
+            'ELEPHANT', 'SPECTRUM', 'TWILIGHT', 'UNIVERSE', 'VARIABLE', 'WIRELESS', 'ACADEMIC',
+            'BASEMENT', 'CREATURE', 'DIAMOND', 'FOUNTAIN', 'GARDENER', 'INCIDENT',
+            'JOYSTICK', 'NONSENSE', 'OBSTACLE', 'PARADISE', 'QUESTION', 'ABUNDANT', 'CAPTURED', 'DECORATE',
+            'ELEGANCE', 'FANTASTIC', 'GENEROUS', 'HARMONY', 'ILLUSION', 'JOURNAL', 'LUSCIOUS', 'MYSTERIOUS',
+            'NARRATOR', 'OVERCOME', 'POSITIVE', 'QUALIFIED', 'RADIANCE', 'SERENITY', 'TREASURE', 'UNDERTAKE',
+            'VIBRANT', 'WONDERFUL', 'YACHTING', 'ADVENTURE', 'BRILLIANT', 'CHAMPION', 'DISCOVER', 'ESSENCE',
+
+            // Academic/Technical terms (학술/기술 용어) - 10글자 이하 유지
+            'ALGORITHM', 'BANDWIDTH', 'CHEMISTRY', 'DATABASE', 'ECOSYSTEM', 'FRAMEWORK', 'GENETICS', 'HISTOGRAM',
+            'INTERFACE', 'JAVASCRIPT', 'KINEMATIC', 'LOGISTICS', 'MICROWAVE', 'NEUROLOGY', 'ORCHESTRA', 'PROTOCOL',
+            'QUARANTINE', 'RADIATION', 'SYNTHESIS', 'TELESCOPE', 'VOCABULARY', 'WAVELENGTH', 'XEROGRAPHY',
+            'ZOOLOGY', 'CRYPTOGRAPHY', 'DEMOGRAPHICS', 'SEISMOLOGY',
+            'QUANTUM', 'ROBOTICS', 'STATISTICS', 'TECHNOLOGY', 'VIRTUAL', 'WIKIPEDIA', 'YOUTUBE',
+            'ZIGZAG', 'ANALYSIS', 'BIOLOGY', 'CALCULUS', 'DATASET', 'FORMULA', 'GEOMETRY', 'HYPOTHESIS',
+            'INNOVATION', 'JUNCTURE', 'LABORATORY', 'METADATA', 'NEUTRONS', 'OPTICS', 'PARADIGM', 'QUOTIENT', 'RESOLUTION',
+            
+            // Advanced adjectives/adverbs (고급 형용사/부사) - 10글자 이하 유지
+            'MAGNIFICENT', 'SPECTACULAR', 'TREMENDOUS', 'INCREDIBLE', 'OUTSTANDING', 'REMARKABLE',
+            'EXCEPTIONAL', 'PHENOMENAL', 'ASTONISHING', 'BREATHTAKING', 'OVERWHELMING', 'UNPRECEDENTED',
+            'SOPHISTICATED', 'COMPREHENSIVE', 'EXPERIMENTAL',
+            'FUNDAMENTAL', 'INTELLECTUAL', 'PROFESSIONAL', 'TECHNOLOGICAL', 'PHILOSOPHICAL', 'PSYCHOLOGICAL',
+            'ABSOLUTELY', 'ACCURATELY', 'ADAPTIVELY', 'BEAUTIFULLY', 'CAREFULLY', 'COMPLETELY', 'CONSISTENTLY',
+            'DEFINITELY', 'EFFORTLESSLY', 'ESPECIALLY', 'EXACTLY', 'EXTENSIVELY', 'FREQUENTLY', 'GRADUALLY',
+            'IMMEDIATELY', 'INCREASINGLY', 'INNOVATIVELY', 'LEGITIMATELY', 'NECESSARILY', 'OPTIMALLY', 'PARTICULARLY',
+            'POTENTIALLY', 'PRECISELY', 'RAPIDLY', 'RELIABLY', 'SIGNIFICANTLY', 'SUCCESSFULLY', 'ULTIMATELY',
+            
+            // Compound words/Specialized terms (복합어/전문 용어) - 10글자 이하 유지
+            'BREAKTHROUGH', 'MARKETPLACE', 'SPOKESPERSON', 'HEADQUARTERS',
+            'NEVERTHELESS', 'FURTHERMORE', 'CONSEQUENCE', 'SIGNIFICANCE', 'MAINTENANCE', 'PERFORMANCE',
+            'ARCHITECTURE', 'MATHEMATICS', 'PHOTOGRAPHY', 'BIBLIOGRAPHY', 'CHOREOGRAPHY',
+            'AUTOBIOGRAPHY', 'CHAMPIONSHIP', 'RELATIONSHIP', 'WORKMANSHIP',
+            'ENCYCLOPEDIA', 'THUNDERSTORM', 'GRASSHOPPER', 'TOOTHBRUSH', 'EARTHQUAKE',
+            'BACKGROUND', 'BASKETBALL', 'BUTTERFLY', 'CAREFREE', 'DAYLIGHT', 'DOORWAY', 'EVERYTHING', 'FIREFLY',
+            'FORECAST', 'GOLDFISH', 'GRANDCHILD', 'HEADLIGHT', 'HOUSEPLANT', 'KEYSTONE', 'LANDSCAPE', 'LIFETIME',
+            'MOONLIGHT', 'OUTSTANDING', 'OVERNIGHT', 'PASSPORT', 'RAINDROP', 'SEASHELL', 'SUNFLOWER', 'TEACUP',
+            'UNDERWATER', 'WATERFALL', 'WITHOUT', 'WORKOUT', 'ZIPPER'
+        ];
+
+        let currentGrid = null;
+        let currentWords = null;
+        let answerGrid = null;
+        let showingAnswer = false;
+        const GRID_SIZE = 21; // 통일된 그리드 크기
+
+        // 커스텀 모달을 표시하는 함수
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('myModal').style.display = 'flex'; // 중앙 정렬을 위해 flex 사용
+        }
+
+        // 커스텀 모달을 닫는 함수
+        function closeModal() {
+            document.getElementById('myModal').style.display = 'none';
+        }
+
+        // 크로스워드를 생성하는 함수
+        function generateCrossword() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('crosswordContainer').style.display = 'none';
+            document.getElementById('downloadBtn').disabled = true;
+            
+            // 컨테이너를 먼저 보이게 하여 offsetWidth가 올바르게 계산되도록 함
+            document.getElementById('crosswordContainer').style.display = 'flex'; 
+
+            setTimeout(() => {
+                const result = createFillInCrossword(GRID_SIZE);
+                
+                // 충분한 단어가 배치되었는지 확인
+                if (result && result.words.length > 5) {
+                    currentGrid = result.emptyGrid;
+                    answerGrid = result.answerGrid;
+                    currentWords = result.words;
+                    showingAnswer = false;
+                    displayCrossword(currentGrid, currentWords, GRID_SIZE);
+                    document.getElementById('downloadBtn').disabled = false;
+                } else {
+                    showModal('크로스워드 생성에 실패했습니다. (충분한 단어가 배치되지 않음) 다시 시도해주세요.');
+                }
+                
+                document.getElementById('loading').style.display = 'none';
+                // crosswordContainer는 이미 위에 flex로 설정되어 있으므로 주석 처리
+                // document.getElementById('crosswordContainer').style.display = 'flex';
+            }, 1500);
+        }
+
+        // 채워넣기 크로스워드를 생성하는 핵심 로직
+        function createFillInCrossword(size) {
+            const grid = Array(size).fill(null).map(() => Array(size).fill(''));
+            const answerGrid = Array(size).fill(null).map(() => Array(size).fill(''));
+            const emptyGrid = Array(size).fill(null).map(() => Array(size).fill(''));
+            const usedWords = [];
+            
+            // 단어 데이터베이스를 섞고 길이(3~10자)에 따라 필터링
+            let shuffledAndFilteredWords = [...wordDatabase]
+                .filter(word => word.length >= 3 && word.length <= 10)
+                .sort(() => Math.random() - 0.5); // 단어를 한 번만 섞습니다.
+
+            if (shuffledAndFilteredWords.length === 0) return null; // 배치할 단어가 없으면 null 반환
+
+            // 1. 첫 번째 단어 배치 (무작위로 선택)
+            const firstWord = shuffledAndFilteredWords.shift(); // 섞인 리스트에서 첫 단어를 가져옵니다.
+            const startRow = Math.floor(size / 2);
+            const startCol = Math.floor((size - firstWord.length) / 2);
+            
+            if (firstWord && startCol >= 0 && startCol + firstWord.length <= size) {
+                for (let i = 0; i < firstWord.length; i++) {
+                    grid[startRow][startCol + i] = firstWord[i];
+                    answerGrid[startRow][startCol + i] = firstWord[i];
+                }
+                usedWords.push(firstWord);
+            } else {
+                return null; // 첫 단어를 배치할 수 없으면 null 반환
+            }
+
+            // 2. 남은 단어들을 교차점을 찾아 배치 시도 (목표 개수까지)
+            const targetWordCount = 25; // 퍼즐에 배치할 목표 단어 개수
+
+            for (const word of shuffledAndFilteredWords) { // 남은 섞인 단어들을 순회
+                if (usedWords.length >= targetWordCount) break; // 목표 개수에 도달하면 중단
+
+                const placement = findIntersection(grid, word, size);
+                
+                if (placement) {
+                    placeWord(grid, word, placement);
+                    placeWord(answerGrid, word, placement);
+                    usedWords.push(word);
+                }
+            }
+            
+            // 빈 그리드 생성 (빈 칸은 검은 셀, 채워진 칸은 빈 플레이 가능한 셀)
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    if (grid[row][col] === '') {
+                        emptyGrid[row][col] = ''; // 검은 셀
+                    } else {
+                        emptyGrid[row][col] = ' '; // 빈 플레이 가능 셀
+                    }
+                }
+            }
+            
+            return { 
+                emptyGrid: emptyGrid, 
+                answerGrid: answerGrid, 
+                words: usedWords.sort((a, b) => a.length - b.length || a.localeCompare(b)) // 사용된 단어 정렬
+            };
+        }
+
+        // 단어가 그리드에 교차할 수 있는 위치를 찾는 함수
+        function findIntersection(grid, word, size) {
+            const validPlacements = [];
+            
+            // 기존 그리드 셀을 순회
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    if (grid[row][col] && grid[row][col] !== '') { // 셀에 글자가 있으면
+                        const gridLetter = grid[row][col];
+                        
+                        // 현재 단어가 이 글자를 포함하는지 확인
+                        for (let i = 0; i < word.length; i++) {
+                            if (word[i] === gridLetter) {
+                                // 가로 배치 시도
+                                const hCol = col - i;
+                                if (canPlaceHorizontal(grid, word, row, hCol, size)) {
+                                    validPlacements.push({
+                                        row: row,
+                                        col: hCol,
+                                        direction: 'across'
+                                    });
+                                }
+                                
+                                // 세로 배치 시도
+                                const vRow = row - i;
+                                if (canPlaceVertical(grid, word, vRow, col, size)) {
+                                    validPlacements.push({
+                                        row: vRow,
+                                        col: col,
+                                        direction: 'down'
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 유효한 배치 중 무작위 하나를 반환, 없으면 null 반환
+            return validPlacements.length > 0 ? validPlacements[Math.floor(Math.random() * validPlacements.length)] : null;
+        }
+
+        // 단어를 가로로 배치할 수 있는지 확인하는 함수
+        function canPlaceHorizontal(grid, word, row, col, size) {
+            // 경계 확인
+            if (col < 0 || col + word.length > size || row < 0 || row >= size) return false;
+            
+            // 앞뒤 셀이 비어 있는지 확인
+            if (col > 0 && grid[row][col - 1] !== '') return false;
+            if (col + word.length < size && grid[row][col + word.length] !== '') return false;
+            
+            for (let i = 0; i < word.length; i++) {
+                const currentCell = grid[row][col + i];
+                // 셀이 다른 글자로 채워져 있거나 글자가 있어야 할 검은 셀인 경우
+                if (currentCell !== '' && currentCell !== word[i]) {
+                    return false;
+                }
+                
+                // 현재 셀이 비어 있으면 위아래 셀에 충돌하는 글자가 있는지 확인
+                if (currentCell === '') {
+                    if (row > 0 && grid[row - 1][col + i] !== '') return false;
+                    if (row < size - 1 && grid[row + 1][col + i] !== '') return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // 단어를 세로로 배치할 수 있는지 확인하는 함수
+        function canPlaceVertical(grid, word, row, col, size) {
+            // 경계 확인
+            if (row < 0 || row + word.length > size || col < 0 || col >= size) return false;
+            
+            // 위아래 셀이 비어 있는지 확인
+            if (row > 0 && grid[row - 1][col] !== '') return false;
+            if (row + word.length < size && grid[row + word.length][col] !== '') return false;
+            
+            for (let i = 0; i < word.length; i++) {
+                const currentCell = grid[row + i][col];
+                // 셀이 다른 글자로 채워져 있거나 글자가 있어야 할 검은 셀인 경우
+                if (currentCell !== '' && currentCell !== word[i]) {
+                    return false;
+                }
+                
+                // 현재 셀이 비어 있으면 좌우 셀에 충돌하는 글자가 있는지 확인
+                if (currentCell === '') {
+                    if (col > 0 && grid[row + i][col - 1] !== '') return false;
+                    if (col < size - 1 && grid[row + i][col + 1] !== '') return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // 단어를 그리드에 배치하는 함수
+        function placeWord(grid, word, placement) {
+            if (placement.direction === 'across') { // 가로 방향
+                for (let i = 0; i < word.length; i++) {
+                    grid[placement.row][placement.col + i] = word[i];
+                }
+            } else { // 세로 방향 ('down')
+                for (let i = 0; i < word.length; i++) {
+                    grid[placement.row + i][placement.col] = word[i];
+                }
+            }
+        }
+
+        // 크로스워드를 HTML에 표시하는 함수
+        function displayCrossword(grid, words, size) {
+            const gridContainer = document.getElementById('crosswordGrid');
+            // .grid-container의 max-width에 맞춰 셀 크기를 동적으로 계산합니다.
+            // CSS에 설정된 max-width: 450px를 기준으로 셀 크기를 계산합니다.
+            const cellSize = 450 / size; // 450px는 .grid-container의 max-width
+            gridContainer.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
+            gridContainer.innerHTML = '';
+            
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    // 동적으로 계산된 셀 크기를 적용합니다.
+                    cell.style.width = `${cellSize}px`;
+                    cell.style.height = `${cellSize}px`;
+                    
+                    if (grid[row][col] === '') {
+                        cell.className += ' black'; // 검은 셀
+                    } else if (grid[row][col] === ' ') {
+                        // 빈 플레이 가능 셀
+                        cell.style.backgroundColor = 'white';
+                        cell.style.border = '0.5px solid #ccc';
+                    } else {
+                        // 글자가 있는 셀 (정답 보기용)
+                        cell.textContent = grid[row][col];
+                    }
+                    
+                    gridContainer.appendChild(cell);
+                }
+            }
+            
+            // 단어 목록 표시
+            document.getElementById('wordList').innerHTML = words.map(word => `<li>${word}</li>`).join('');
+        }
+
+        // 빈 격자를 보여주는 함수
+        function showEmptyGrid() {
+            if (currentGrid) {
+                showingAnswer = false;
+                displayCrossword(currentGrid, currentWords, GRID_SIZE);
+            }
+        }
+
+        // 정답 격자를 보여주는 함수
+        function showAnswerGrid() {
+            if (answerGrid) {
+                showingAnswer = true;
+                displayCrossword(answerGrid, currentWords, GRID_SIZE);
+            }
+        }
+
+        // PDF로 다운로드하는 함수
+        function downloadPDF() {
+            if (!currentGrid || !currentWords || !answerGrid) {
+                showModal('PDF를 다운로드할 크로스워드가 없습니다.');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const size = GRID_SIZE; // 통일된 그리드 크기 사용
+            
+            // PDF에 한글을 지원하려면 한글 폰트를 임베드해야 합니다.
+            // 이 예시는 영어에 적합한 기본 폰트를 사용합니다.
+            // 만약 PDF에 한글 텍스트가 필수적이라면 다음을 추가해야 합니다:
+            // doc.addFont('font-name.ttf', 'font-family', 'normal');
+            // doc.setFont('font-family');
+            
+            // 제목
+            doc.setFontSize(20);
+            doc.text('Fill-in Crossword Puzzle', 105, 20, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text('Fill in the empty squares using the words listed below.', 105, 30, { align: 'center' });
+            
+            // 퍼즐용 빈 그리드 그리기
+            const puzzleStartX = 20;
+            const puzzleStartY = 45; // Y 위치 조정
+            const puzzleCellSize = 7; // PDF용 셀 크기 조정 (21x21 그리드)
+            
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    const x = puzzleStartX + col * puzzleCellSize;
+                    const y = puzzleStartY + row * puzzleCellSize;
+                    
+                    if (currentGrid[row][col] === '') {
+                        doc.setFillColor(0, 0, 0);
+                        doc.rect(x, y, puzzleCellSize, puzzleCellSize, 'F');
+                    } else {
+                        doc.setFillColor(255, 255, 255);
+                        doc.rect(x, y, puzzleCellSize, puzzleCellSize, 'FD');
+                    }
+                }
+            }
+            
+            // 단어 목록
+            let wordsListStartY = puzzleStartY + size * puzzleCellSize + 20;
+            doc.setFontSize(14);
+            doc.text('Words to use:', puzzleStartX, wordsListStartY);
+            wordsListStartY += 10;
+            
+            doc.setFontSize(10);
+            let xPos = puzzleStartX;
+            const wordsPerRow = 5; // 한 줄에 더 많은 단어를 위한 레이아웃 조정
+            const wordColWidth = 35; // 단어의 열 너비 조정
+
+            currentWords.forEach((word, index) => {
+                if (index > 0 && index % wordsPerRow === 0) {
+                    wordsListStartY += 8;
+                    xPos = puzzleStartX;
+                }
+                
+                doc.text(word, xPos, wordsListStartY);
+                xPos += wordColWidth;
+                
+                // 내용이 넘치면 새 페이지 추가
+                if (wordsListStartY > 270) {
+                    doc.addPage();
+                    wordsListStartY = 20;
+                    xPos = puzzleStartX;
+                }
+            });
+            
+            // 정답 그리드 그리기 (새 페이지 하단 또는 공간이 있으면 같은 페이지에)
+            if (wordsListStartY + 80 > 270) { // 공간이 충분한지 확인, 아니면 새 페이지 추가
+                doc.addPage();
+                wordsListStartY = 20; // 새 페이지를 위해 Y 재설정
+            }
+            const answerGridStartX = 20; // 시작 X 위치를 왼쪽으로 이동하여 더 크게 보이게 함
+            const answerGridStartY = wordsListStartY + 20;
+            const answerCellSize = 4.0; // 정답 키 셀 크기를 더 키움 (2.5 -> 4.0)
+            
+            doc.setFontSize(10); // 정답 그리드 제목 글자 크기
+            doc.text('Answer:', answerGridStartX, answerGridStartY - 5);
+            
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    const x = answerGridStartX + col * answerCellSize;
+                    const y = answerGridStartY + row * answerCellSize;
+                    
+                    if (answerGrid[row][col] === '') {
+                        doc.setFillColor(0, 0, 0);
+                        doc.rect(x, y, answerCellSize, answerCellSize, 'F');
+                    } else {
+                        doc.setFillColor(255, 255, 255);
+                        doc.rect(x, y, answerCellSize, answerCellSize, 'FD');
+                        
+                        doc.setFontSize(5); // 정답 글자를 위한 글꼴 크기 키움 (3.5 -> 5)
+                        doc.text(answerGrid[row][col], x + answerCellSize * 0.25, y + answerCellSize * 0.7); // 셀 중앙에 가깝게 조정
+                    }
+                }
+            }
+            
+            doc.save(`fill-in-crossword-${Date.now()}.pdf`);
+        }
+
+        // 페이지 로드 시 첫 번째 크로스워드 생성
+        window.addEventListener('load', () => {
+            generateCrossword();
+        });
+    </script>
+</body>
+</html>
