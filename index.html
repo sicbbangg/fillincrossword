@@ -14,7 +14,7 @@
             letter-spacing: -0.03em; /* 한글 폰트 자간 미세 조정 */
             max-width: 1200px;
             margin: 0 auto;
-            padding: 40px;
+            padding: 40px 40px 80px 40px; /* 아래쪽 패딩을 80px로 늘림 */
             background: #F1F6F9; /* 배경을 쿨그레이 단색으로 변경 */
             min-height: 100vh;
             color: #333;
@@ -24,7 +24,7 @@
         .container {
             background: white;
             border-radius: 40px;
-            padding: 30px;
+            padding: 40px 40px 80px 40px; /* 컨테이너의 아래쪽 패딩을 80px로 늘림 */
         }
         
         h1 {
@@ -93,20 +93,23 @@
         
         .crossword-container {
             display: flex;
-            flex-direction: column; 
-            gap: 30px; 
-            margin-top: 30px;
+            flex-direction: row; /* 가로로 배치 */
+            gap: 60px; /* 간격 더 넓히기 */
+            margin-top: 50px;
+            flex-wrap: wrap; /* 화면이 좁아지면 줄 바꿈 */
+            justify-content: center; /* 가운데 정렬 유지 */
+            align-items: flex-start; /* 상단 정렬 */
         }
         
         .grid-container {
             position: relative; 
-            flex: none; 
+            flex: none; /* 유연하게 확장하지 않고 고정된 너비 유지 */
             min-width: 320px;
-            max-width: 450px;
+            max-width: 380px; /* 격자 최대 너비 */
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 0 auto; 
+            margin: 0; /* 중앙 정렬 대신 flex 컨테이너 정렬에 따름 */
             padding-bottom: 20px; 
         }
         
@@ -148,24 +151,33 @@
         }
         
         .words-section {
-            flex: none; 
-            min-width: 280px;
-            width: 100%; 
+            flex: 1; /* 남은 공간을 채우도록 확장 */
+            min-width: 280px; /* 최소 너비 */
+            max-width: 400px; /* 단어 섹션의 최대 너비 제한 */
             padding-left: 0; 
             text-align: left; 
             box-sizing: border-box; 
+            margin-top: 0; /* 상단 마진 제거, flex gap이 간격 제공 */
         }
         
+        .words-section h3 {
+            color: #333;
+            border-bottom: none; /* 선 제거 */
+            padding-bottom: 5px;
+            margin-bottom: 0px; /* h3 아래 마진 제거 */
+            width: 100%; /* 부모 너비에 꽉 채움 */
+            box-sizing: border-box; /* 패딩/보더 포함 */
+        }
         
         .word-list {
             display: flex; 
             flex-wrap: wrap; 
-            justify-content: center; /* 단어 아이템들을 가로 가운데 정렬 */
-            gap: 8px;
+            justify-content: flex-start; /* 단어 아이템들을 왼쪽 정렬 */
+            gap: 12px; /* 단어 간격 10px로 변경 */
             padding: 0;
             list-style: none;
             width: 100%; 
-            margin: 0 auto; /* 리스트 자체를 중앙 정렬 */
+            margin: 0; /* 중앙 정렬 제거 */
         }
         
         .word-list li {
@@ -270,7 +282,7 @@
         .toggle-switch-container {
             position: absolute;
             bottom: 0px; 
-            right: -10px; 
+            left: -10px; /* 왼쪽으로 이동 */
             display: flex;
             align-items: center;
             gap: 10px;
@@ -378,7 +390,7 @@
             </div>
             
             <div class="words-section">
-                <h3></h3>
+                <!-- <h3></h3> 제거 -->
                 <ul id="wordList" class="word-list"></ul>
             </div>
         </div>
@@ -741,7 +753,7 @@
         // 크로스워드를 HTML에 표시하는 함수
         function displayCrossword(grid, words, size) {
             const gridContainer = document.getElementById('crosswordGrid');
-            const gridContainerMaxWidth = 450; // CSS에 설정된 .grid-container의 max-width
+            const gridContainerMaxWidth = 380; // CSS에 설정된 .grid-container의 max-width
             const cellSize = gridContainerMaxWidth / size; 
             
             gridContainer.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
