@@ -6,7 +6,7 @@
     <title>Fill-in 크로스워드 퍼즐 생성기</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap'); /* Noto Sans KR 폰트로 통일 */
+       @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap'); /* Noto Sans KR 폰트로 통일 */
 
         body {
             font-family: 'Noto Sans KR', sans-serif; /* Noto Sans KR 폰트 적용 */
@@ -279,6 +279,7 @@
                 <div class="toggle-buttons">
                     <button onclick="showEmptyGrid()">빈 격자 보기</button>
                     <button onclick="showAnswerGrid()">정답 보기</button>
+                    <!-- 힌트 보기 (글자 하나 공개) 버튼 제거 -->
                 </div>
                 <div id="crosswordGrid" class="crossword-grid"></div>
             </div>
@@ -409,13 +410,15 @@
                     showingAnswer = false;
                     displayCrossword(currentGrid, currentWords, GRID_SIZE);
                     document.getElementById('downloadBtn').disabled = false;
+                    
+                    // 퍼즐 생성 후 기본적으로 힌트 글자 하나 공개
+                    revealHintLetterInternal(); 
+
                 } else {
                     showModal('크로스워드 생성에 실패했습니다. (충분한 단어가 배치되지 않음) 다시 시도해주세요.');
                 }
                 
                 document.getElementById('loading').style.display = 'none';
-                // crosswordContainer는 이미 위에 flex로 설정되어 있으므로 주석 처리
-                // document.getElementById('crosswordContainer').style.display = 'flex';
             }, 1500);
         }
 
@@ -591,9 +594,9 @@
         // 크로스워드를 HTML에 표시하는 함수
         function displayCrossword(grid, words, size) {
             const gridContainer = document.getElementById('crosswordGrid');
-            // .grid-container의 max-width에 맞춰 셀 크기를 동적으로 계산합니다.
-            // CSS에 설정된 max-width: 450px를 기준으로 셀 크기를 계산합니다.
-            const cellSize = 450 / size; // 450px는 .grid-container의 max-width
+            const gridContainerMaxWidth = 450; // CSS에 설정된 .grid-container의 max-width
+            const cellSize = gridContainerMaxWidth / size; 
+            
             gridContainer.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
             gridContainer.innerHTML = '';
             
@@ -607,13 +610,10 @@
                     
                     if (grid[row][col] === '') {
                         cell.className += ' black'; // 검은 셀
-                    } else if (grid[row][col] === ' ') {
-                        // 빈 플레이 가능 셀
+                    } else { // 글자가 있거나 빈 플레이 가능 셀
                         cell.style.backgroundColor = 'white';
                         cell.style.border = '0.5px solid #ccc';
-                    } else {
-                        // 글자가 있는 셀 (정답 보기용)
-                        cell.textContent = grid[row][col];
+                        cell.textContent = grid[row][col] === ' ' ? '' : grid[row][col]; // ' ' 이면 빈 칸, 아니면 글자 표시
                     }
                     
                     gridContainer.appendChild(cell);
@@ -639,6 +639,35 @@
                 displayCrossword(answerGrid, currentWords, GRID_SIZE);
             }
         }
+
+        // 힌트 글자 하나를 공개하는 함수
+        // 이 함수는 '힌트 보기' 버튼이 제거되었으므로 내부적으로만 사용됩니다.
+        function revealHintLetterInternal() {
+            const emptyPlayableCells = []; // 빈 칸의 좌표를 저장할 배열
+
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    // 현재 그리드에서는 빈 칸이면서, 정답 그리드에는 글자가 있는 칸만 선택
+                    if (currentGrid[r][c] === ' ' && answerGrid[r][c] !== '') {
+                        emptyPlayableCells.push({ row: r, col: c });
+                    }
+                }
+            }
+
+            if (emptyPlayableCells.length === 0) {
+                //showModal('더 이상 공개할 수 있는 빈 칸이 없습니다. 모든 글자가 채워졌거나, 더 이상 놓을 곳이 없습니다!');
+                return; // 모달 메시지는 버튼이 없으므로 주석 처리
+            }
+
+            // 무작위로 하나의 빈 칸 선택
+            const randomIndex = Math.floor(Math.random() * emptyPlayableCells.length);
+            const { row, col } = emptyPlayableCells[randomIndex];
+
+            // 선택된 칸에 정답 글자 공개
+            currentGrid[row][col] = answerGrid[row][col];
+            displayCrossword(currentGrid, currentWords, GRID_SIZE);
+        }
+
 
         // PDF로 다운로드하는 함수
         function downloadPDF() {
@@ -680,6 +709,11 @@
                     } else {
                         doc.setFillColor(255, 255, 255);
                         doc.rect(x, y, puzzleCellSize, puzzleCellSize, 'FD');
+                        // 힌트로 공개된 글자가 있다면 PDF 퍼즐에도 표시
+                        if (currentGrid[row][col] !== ' ') {
+                            doc.setFontSize(puzzleCellSize * 0.6); // 셀 크기에 비례하여 폰트 크기 조정
+                            doc.text(currentGrid[row][col], x + puzzleCellSize * 0.1, y + puzzleCellSize * 0.75);
+                        }
                     }
                 }
             }
