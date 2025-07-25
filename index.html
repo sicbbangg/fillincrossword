@@ -15,7 +15,7 @@
             max-width: 1200px; /* 전체 페이지 최대 너비 */
             margin: 0 auto;
             padding: 30px 40px 80px 40px; /* 상하좌우 패딩 조정 */
-            background: #F1F6F9; /* 배경을 쿨그레이 단색으로 변경 */
+            background: #F1F9F9; /* 배경을 쿨그레이 단색으로 변경 */
             min-height: 100vh;
             color: #333;
             font-weight: 400; /* 기본 폰트 굵기를 400(normal)로 명시 */
@@ -1005,7 +1005,7 @@
             const puzzleCellSize = 7; // PDF용 셀 크기 (고정, 선택된 그리드 크기에 따라 전체 너비가 달라짐)
             
             for (let row = 0; row < size; row++) {
-                for (let col = 0; col < size; col++) {
+                for (let col = 0; col < size; col++) { // FIXED: Changed <= to <
                     const x = puzzleStartX + col * puzzleCellSize;
                     const y = puzzleStartY + row * puzzleCellSize;
                     
@@ -1065,7 +1065,7 @@
             doc.text('Answer:', answerGridStartX, answerGridStartY - 5);
             
             for (let row = 0; row < size; row++) {
-                for (let col = 0; col <= size; col++) { /* FIXED: Changed =< to <= */
+                for (let col = 0; col < size; col++) { /* FIXED: Changed <= to < */
                     const x = answerGridStartX + col * answerCellSize;
                     const y = answerGridStartY + row * answerCellSize;
                     
