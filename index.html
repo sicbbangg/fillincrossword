@@ -12,7 +12,7 @@
         body {
             font-family: 'Funnel Sans', 'Noto Sans KR', sans-serif; /* 영어는 Funnel Sans, 한글은 Noto Sans KR 사용 */
             letter-spacing: -0.03em; /* 한글 폰트 자간 미세 조정 */
-            max-width: 1200px; /* 전체 페이지 최대 너비를 1400px로 증가 */
+            max-width: 1200px; /* 전체 페이지 최대 너비 */
             margin: 0 auto;
             padding: 30px 40px 40px 40px; /* 상하좌우 패딩 조정 */
             background: #F1F6F9; /* 배경을 쿨그레이 단색으로 변경 */
@@ -23,8 +23,9 @@
         
         .container {
             background: white;
-            border-radius: 40px;
+            border-radius: 60px;
             padding: 60px 120px; /* 좌우 패딩을 120px로 늘려 컨테이너가 더 넓어 보이게 함 */
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
         }
         
         h1 {
@@ -97,8 +98,10 @@
             gap: 60px; /* 간격 더 넓히기 */
             margin-top: 20px;
             flex-wrap: wrap; /* 화면이 좁아지면 줄 바꿈 */
-            justify-content: flex-start; /* 컨테이너 내부 아이템들을 왼쪽 정렬 */
+            justify-content: center; /* 컨테이너 내부 아이템들을 왼쪽 정렬 */
             align-items: flex-start; /* 상단 정렬 */
+            margin-left: auto; /* 자동 마진으로 중앙 정렬 */
+            margin-right: auto;
         }
         
         .grid-container {
@@ -106,11 +109,13 @@
             flex: none; /* 유연하게 확장하지 않고 고정된 너비 유지 */
             min-width: 320px;
             max-width: 430px; /* 격자 최대 너비 증가 */
+            width: 100%; /* 반응형을 위해 기본 너비 설정 */
             display: flex;
             flex-direction: column;
             align-items: flex-start; /* 격자 내부 콘텐츠를 왼쪽 정렬 */
             margin: 0; 
             padding-bottom: 20px; 
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
         }
         
         .crossword-grid {
@@ -359,6 +364,85 @@
             color: #174374;
             font-weight: 500;
             letter-spacing: -0.03em; /* 한글 자간 통일 */
+        }
+
+        /* 반응형 디자인을 위한 미디어 쿼리 */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px 40px 15px; /* 모바일에서 바디 패딩 줄이기 */
+                max-width: 100%; /* 최대 너비 제한 해제 */
+            }
+
+            .container {
+                border-radius: 20px; /* 모바일에서 컨테이너 모서리 덜 둥글게 */
+                padding: 20px; /* 모바일에서 컨테이너 패딩 줄이기 */
+            }
+
+            h1 {
+                font-size: 36px; /* 모바일에서 제목 글꼴 크기 줄이기 */
+                margin-bottom: 30px;
+            }
+
+            .controls {
+                flex-direction: column; /* 모바일에서 버튼 세로로 쌓기 */
+                gap: 10px;
+                align-items: center; /* 버튼 그룹 중앙 정렬 */
+            }
+            
+            button {
+                width: 100%; /* 버튼이 부모 너비를 채우되 */
+                max-width: 250px; /* 최대 너비를 설정하여 너무 넓어지지 않게 함 */
+                padding: 12px 20px; /* 모바일에서 버튼 패딩 유지 */
+            }
+
+            .crossword-container {
+                flex-direction: column; /* 모바일에서 격자와 단어 리스트 세로로 쌓기 */
+                gap: 30px; /* 세로 간격 조정 */
+                align-items: center; /* 세로 쌓기 시 중앙 정렬 */
+                margin-left: 0; /* 모바일에서는 자동 마진 제거 */
+                margin-right: 0; /* 모바일에서는 자동 마진 제거 */
+            }
+
+            .grid-container {
+                max-width: 95vw; /* 뷰포트 너비의 95% 사용 */
+                min-width: unset; /* 최소 너비 제한 해제 */
+                width: 100%; /* 부모 너비 채우기 */
+                align-items: center; /* 격자를 그리드 컨테이너 내에서 중앙 정렬 */
+            }
+
+            .crossword-grid {
+                width: 95vw; /* 격자 너비를 뷰포트 너비에 맞춰 유동적으로 */
+                max-width: 430px; /* 그러나 데스크탑의 최대 너비를 넘지 않도록 */
+            }
+
+            .words-section {
+                max-width: 95vw; /* 모바일에서 단어 섹션도 뷰포트 너비에 맞춰 */
+                min-width: unset; /* 최소 너비 제한 해제 */
+                width: 100%; /* 부모 너비 채우기 */
+                margin-top: 0; /* flex gap이 간격 제공 */
+            }
+
+            .word-list {
+                justify-content: center; /* 모바일에서 단어 리스트 아이템 중앙 정렬 */
+                gap: 8px; /* 모바일에서 단어 간격 줄이기 */
+            }
+
+            .toggle-switch-container {
+                position: relative; /* 모바일에서는 상대 위치로 변경 */
+                margin-top: 10px; /* 격자와 토글 스위치 사이 간격 */
+                left: unset; /* 절대 위치 제거 */
+                bottom: unset; /* 절대 위치 제거 */
+                width: 100%; /* 컨테이너 너비 채우기 */
+                justify-content: center; /* 중앙 정렬 */
+            }
+
+            .toggle-label {
+                font-size: 13px; /* 모바일에서 토글 라벨 글꼴 크기 줄이기 */
+            }
+
+            .loading {
+                margin: 30px 0; /* 모바일에서 로딩 메시지 마진 조정 */
+            }
         }
     </style>
 </head>
@@ -753,7 +837,13 @@
         // 크로스워드를 HTML에 표시하는 함수
         function displayCrossword(grid, words, size) {
             const gridContainer = document.getElementById('crosswordGrid');
-            const gridContainerMaxWidth = 430; // CSS에 설정된 .grid-container의 max-width에 맞춰 업데이트
+            // CSS에 설정된 .grid-container의 max-width에 맞춰 업데이트
+            const gridContainerMaxWidth = 430; // 데스크탑 max-width
+            // 모바일에서는 .crossword-grid의 width: 95vw 또는 max-width: 430px가 적용되므로
+            // 이 값을 기준으로 cellSize를 계산해야 합니다.
+            // 여기서는 고정된 max-width를 사용하므로, 뷰포트에 따라 유연하게 바뀌지 않습니다.
+            // CSS @media 쿼리와 JS 로직을 연동하여 정확한 뷰포트 너비를 기반으로 계산하려면 추가 작업이 필요합니다.
+            // 일단 데스크탑 기준 max-width를 사용하며, 모바일 CSS에서 override 되는 것으로 간주합니다.
             const cellSize = gridContainerMaxWidth / size; 
             
             gridContainer.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
