@@ -24,17 +24,17 @@
         .container {
             background: white;
             border-radius: 40px;
-            padding: 50px; /* 컨테이너의 아래쪽 패딩을 80px로 늘림 */
+            padding: 40px 40px 60px 40px; /* 컨테이너의 아래쪽 패딩을 80px로 늘림 */
         }
         
         h1 {
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Bagel Fat One', 'Noto Sans KR', sans-serif;
             text-align: center;
             color: #DFF0FC;
             margin-bottom: 40px;
-            font-size: 40px;
-            font-weight: 600;
-            letter-spacing: -0.03em;
+            font-size: 50px;
+            font-weight: 400;
+            letter-spacing: 0em;
             background: none; 
             -webkit-background-clip: unset;
             -webkit-text-fill-color: #174374;
@@ -46,7 +46,7 @@
             margin-bottom: 20px;
             flex-wrap: wrap;
             align-items: center;
-            justify-content: left; /* 버튼들을 왼쪽으로 정렬 */
+            justify-content: flex-start; /* 버튼들을 왼쪽으로 정렬 */
         }
         
         button {
@@ -97,7 +97,7 @@
             gap: 50px; /* 간격 더 넓히기 */
             margin-top: 20px;
             flex-wrap: wrap; /* 화면이 좁아지면 줄 바꿈 */
-            justify-content: center; /* 가운데 정렬 유지 */
+            justify-content: flex-start; /* 컨테이너 내부 아이템들을 왼쪽 정렬 */
             align-items: flex-start; /* 상단 정렬 */
         }
         
@@ -105,11 +105,11 @@
             position: relative; 
             flex: none; /* 유연하게 확장하지 않고 고정된 너비 유지 */
             min-width: 320px;
-            max-width: 400px; /* 격자 최대 너비 */
+            max-width: 480px; /* 격자 최대 너비 증가 */
             display: flex;
             flex-direction: column;
-            align-items: center;
-            margin: 0; /* 중앙 정렬 대신 flex 컨테이너 정렬에 따름 */
+            align-items: flex-start; /* 격자 내부 콘텐츠를 왼쪽 정렬 */
+            margin: 0; 
             padding-bottom: 20px; 
         }
         
@@ -753,7 +753,7 @@
         // 크로스워드를 HTML에 표시하는 함수
         function displayCrossword(grid, words, size) {
             const gridContainer = document.getElementById('crosswordGrid');
-            const gridContainerMaxWidth = 400; // CSS에 설정된 .grid-container의 max-width
+            const gridContainerMaxWidth = 480; // CSS에 설정된 .grid-container의 max-width에 맞춰 업데이트
             const cellSize = gridContainerMaxWidth / size; 
             
             gridContainer.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
