@@ -14,7 +14,7 @@
             letter-spacing: -0.03em; /* 한글 폰트 자간 미세 조정 */
             max-width: 1200px;
             margin: 0 auto;
-            padding: 80px; /* 아래쪽 패딩을 80px로 늘림 */
+            padding: 40px;
             background: #F1F6F9; /* 배경을 쿨그레이 단색으로 변경 */
             min-height: 100vh;
             color: #333;
@@ -24,14 +24,14 @@
         .container {
             background: white;
             border-radius: 40px;
-            padding: 40px 40px 60px 40px; /* 컨테이너의 아래쪽 패딩을 80px로 늘림 */
+            padding: 60px;
         }
         
         h1 {
             font-family: 'Bagel Fat One', 'Noto Sans KR', sans-serif;
             text-align: center;
             color: #DFF0FC;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
             font-size: 50px;
             font-weight: 400;
             letter-spacing: 0em;
@@ -50,7 +50,7 @@
         }
         
         button {
-            padding: 12px 28px; /* 버튼 위아래 패딩 조정 */
+            padding: 10px 28px; /* 버튼 위아래 패딩 조정 */
             border: none;
             border-radius: 12px; /* 버튼 모서리를 더 둥글게 변경 */
             font-size: 16px;
@@ -105,7 +105,7 @@
             position: relative; 
             flex: none; /* 유연하게 확장하지 않고 고정된 너비 유지 */
             min-width: 320px;
-            max-width: 480px; /* 격자 최대 너비 증가 */
+            max-width: 430px; /* 격자 최대 너비 증가 */
             display: flex;
             flex-direction: column;
             align-items: flex-start; /* 격자 내부 콘텐츠를 왼쪽 정렬 */
@@ -282,7 +282,7 @@
         .toggle-switch-container {
             position: absolute;
             bottom: 0px; 
-            left: -10px; /* 왼쪽으로 이동 */
+            left: 0px; /* 격자와 동일하게 왼쪽 정렬 */
             display: flex;
             align-items: center;
             gap: 10px;
@@ -753,7 +753,7 @@
         // 크로스워드를 HTML에 표시하는 함수
         function displayCrossword(grid, words, size) {
             const gridContainer = document.getElementById('crosswordGrid');
-            const gridContainerMaxWidth = 480; // CSS에 설정된 .grid-container의 max-width에 맞춰 업데이트
+            const gridContainerMaxWidth = 430; // CSS에 설정된 .grid-container의 max-width에 맞춰 업데이트
             const cellSize = gridContainerMaxWidth / size; 
             
             gridContainer.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
