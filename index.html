@@ -14,7 +14,7 @@
             letter-spacing: -0.03em; /* 한글 폰트 자간 미세 조정 */
             max-width: 1200px; /* 전체 페이지 최대 너비 */
             margin: 0 auto;
-            padding: 30px 40px 40px 40px; /* 상하좌우 패딩 조정 */
+            padding: 30px 40px 80px 40px; /* 상하좌우 패딩 조정 */
             background: #F1F6F9; /* 배경을 쿨그레이 단색으로 변경 */
             min-height: 100vh;
             color: #333;
@@ -23,8 +23,8 @@
         
         .container {
             background: white;
-            border-radius: 60px;
-            padding: 60px 120px; /* 좌우 패딩을 120px로 늘려 컨테이너가 더 넓어 보이게 함 */
+            border-radius: 40px;
+            padding: 60px 120px 80px 120px; /* 좌우 패딩을 120px로 늘려 컨테이너가 더 넓어 보이게 함 */
             box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
         }
         
@@ -51,9 +51,9 @@
         }
         
         button {
-            padding: 12px 28px; /* 버튼 위아래 패딩 조정 */
+            padding: 10px 28px; /* 버튼 위아래 패딩 조정 */
             border: none;
-            border-radius: 12px; /* 버튼 모서리를 더 둥글게 변경 */
+            border-radius: 20px; /* 버튼 모서리를 더 둥글게 변경 */
             font-size: 16px;
             font-weight: 500; 
             text-transform: none; /* 대문자 변환 제거 (원래 텍스트 그대로 사용) */
@@ -91,14 +91,26 @@
             box-shadow: none;
         }
         
-        
+        /* Select (드롭다운) 요소 스타일 */
+        #gridSizeSelect {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 16px;
+            margin-right: 16px; /* 데스크탑에서 버튼과의 간격 */
+            box-sizing: border-box;
+            color: #333;
+            background-color: #fff;
+        }
+
         .crossword-container {
             display: flex;
             flex-direction: row; /* 가로로 배치 */
             gap: 60px; /* 간격 더 넓히기 */
             margin-top: 20px;
             flex-wrap: wrap; /* 화면이 좁아지면 줄 바꿈 */
-            justify-content: center; /* 컨테이너 내부 아이템들을 왼쪽 정렬 */
+            justify-content: flex-start; /* 컨테이너 내부 아이템들을 왼쪽 정렬 */
             align-items: flex-start; /* 상단 정렬 */
             margin-left: auto; /* 자동 마진으로 중앙 정렬 */
             margin-right: auto;
@@ -108,7 +120,7 @@
             position: relative; 
             flex: none; /* 유연하게 확장하지 않고 고정된 너비 유지 */
             min-width: 320px;
-            max-width: 430px; /* 격자 최대 너비 증가 */
+            max-width: 480px; /* 격자 표시 영역의 고정된 최대 너비 */
             width: 100%; /* 반응형을 위해 기본 너비 설정 */
             display: flex;
             flex-direction: column;
@@ -124,7 +136,8 @@
             background-color: #333;
             border: 2px solid #333;
             margin-bottom: 20px;
-            width: fit-content;
+            width: 100%; /* 부모의 100% 너비를 사용하도록 변경 */
+            box-sizing: border-box; /* 패딩/테두리 포함 */
         }
         
         .cell {
@@ -132,12 +145,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px; 
+            /* font-size는 JS에서 동적으로 설정됨 */
             font-weight: 500; 
             position: relative;
             border: 1px solid #a0aec0;
             box-sizing: border-box;
-            box-shadow: inset 0 0 3px rgba(0,0,0,0.05);
             letter-spacing: 0.02em; 
         }
         
@@ -178,7 +190,7 @@
             display: flex; 
             flex-wrap: wrap; 
             justify-content: flex-start; /* 단어 아이템들을 왼쪽 정렬 */
-            gap: 12px; /* 단어 간격 유지 */
+            gap: 10px; /* 단어 간격 유지 */
             padding: 0;
             list-style: none;
             width: 100%; 
@@ -187,7 +199,7 @@
         
         .word-list li {
             background: #F4F4F5;
-            padding: 8px 12px; /* 가로 패딩을 늘려 단어를 더 길게 보이도록 조정 */
+            padding: 8px 15px; /* 가로 패딩을 늘려 단어를 더 길게 보이도록 조정 */
             border-radius: 6px;
             text-align: center;
             font-weight: 500; 
@@ -389,10 +401,21 @@
                 align-items: center; /* 버튼 그룹 중앙 정렬 */
             }
             
+            button, #gridSizeSelect { /* 버튼과 드롭다운에 공통 스타일 적용 */
+                display: block; /* 블록 요소로 만들어 세로로 쌓이게 하고 margin auto 적용 */
+                margin: 0 auto; /* 수평 중앙 정렬 */
+                width: auto; /* 내용에 따라 너비 자동 조절 */
+                max-width: 250px; /* 개별 버튼/드롭다운의 최대 너비 제한 */
+                min-width: 180px; /* 최소 너비를 설정하여 너무 작아지지 않게 함 */
+                font-size: 15px; /* 모바일 버튼 폰트 크기 미세 조정 */
+            }
+
             button {
-                width: 100%; /* 버튼이 부모 너비를 채우되 */
-                max-width: 250px; /* 최대 너비를 설정하여 너무 넓어지지 않게 함 */
-                padding: 12px 20px; /* 모바일에서 버튼 패딩 유지 */
+                padding: 10px 20px; /* 모바일에서 버튼 패딩 조정 */
+            }
+
+            #gridSizeSelect {
+                margin-bottom: 10px; /* 드롭다운 아래 여백 추가 */
             }
 
             .crossword-container {
@@ -451,6 +474,12 @@
         <h1>크로스워드 퍼즐 생성기</h1>
         
         <div class="controls">
+            <!-- "격자 크기:" 텍스트 제거 -->
+            <select id="gridSizeSelect" onchange="generateCrossword()" style="padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Noto Sans KR', sans-serif; font-size: 16px; margin-right: 16px;">
+                <option value="15">작게 (15x15)</option>
+                <option value="18">중간 (18x18)</option>
+                <option value="21" selected>크게 (21x21)</option>
+            </select>
             <button onclick="generateCrossword()" id="generateButton">새 퍼즐</button>
             <button onclick="downloadPDF()" id="downloadBtn" disabled>PDF 저장</button>
             <!-- 정답 토글 버튼은 아래 grid-container 안으로 이동 -->
@@ -566,11 +595,10 @@
             'UNDERWATER', 'WATERFALL', 'WITHOUT', 'WORKOUT', 'ZIPPER'
         ];
 
-        let currentGrid = null;
-        let currentWords = null;
-        let answerGrid = null;
-        let showingAnswer = false;
-        const GRID_SIZE = 21; // 통일된 그리드 크기
+        let currentGridSize = 21; // 현재 선택된 그리드 크기를 저장할 변수
+        // 21x21 격자가 차지할 고정된 이상적인 너비를 픽셀 단위로 정의합니다.
+        // 이 값은 가장 큰 격자가 화면에 잘 들어오도록 설정되어야 합니다.
+        const FIXED_GRID_DISPLAY_WIDTH_DESKTOP = 480; // .grid-container의 max-width와 동일하게 설정
 
         // 커스텀 모달을 표시하는 함수
         function showModal(message) {
@@ -596,11 +624,15 @@
             toggleCheckbox.checked = false; // 항상 비활성화 상태로 시작
             toggleLabel.textContent = '정답 보기';
             
-            // 컨테이너를 먼저 보이게 하여 offsetWidth가 올바르게 계산되도록 함
+            // 드롭다운에서 선택된 격자 크기를 가져옵니다.
+            currentGridSize = parseInt(document.getElementById('gridSizeSelect').value);
+
+            // grid-container의 max-width는 CSS에서 고정되므로, JS에서 동적으로 설정하지 않습니다.
+            // 컨테이너를 먼저 보이게 하여 clientWidth가 올바르게 계산되도록 함
             document.getElementById('crosswordContainer').style.display = 'flex'; 
 
             setTimeout(() => {
-                const result = createFillInCrossword(GRID_SIZE);
+                const result = createFillInCrossword(currentGridSize); // 선택된 크기 사용
                 
                 // 충분한 단어가 배치되었는지 확인
                 if (result && result.words.length > 10) { // 최소 10개 이상 단어가 배치되어야 성공으로 간주
@@ -608,7 +640,7 @@
                     answerGrid = result.answerGrid;
                     currentWords = result.words;
                     showingAnswer = false; // 퍼즐 뷰로 시작
-                    displayCrossword(currentGrid, currentWords, GRID_SIZE); // 빈 그리드 표시
+                    displayCrossword(currentGrid, currentWords, currentGridSize); // 선택된 크기 사용
                     document.getElementById('downloadBtn').disabled = false;
                     toggleCheckbox.disabled = false; // 토글 스위치 활성화
                     
@@ -629,7 +661,7 @@
         }
 
         // 채워넣기 크로스워드를 생성하는 핵심 로직
-        function createFillInCrossword(size) {
+        function createFillInCrossword(size) { // size 매개변수 사용
             const grid = Array(size).fill(null).map(() => Array(size).fill(''));
             const answerGrid = Array(size).fill(null).map(() => Array(size).fill(''));
             const emptyGrid = Array(size).fill(null).map(() => Array(size).fill(''));
@@ -691,7 +723,7 @@
         }
 
         // 단어가 그리드에 교차할 수 있는 위치를 찾는 함수
-        function findIntersection(grid, word, size) {
+        function findIntersection(grid, word, size) { // size 매개변수 사용
             const validPlacements = [];
             
             // 기존 그리드 셀을 순회
@@ -733,7 +765,7 @@
         }
 
         // 단어를 가로로 배치할 수 있는지 확인하는 함수
-        function canPlaceHorizontal(grid, word, row, col, size) {
+        function canPlaceHorizontal(grid, word, row, col, size) { // size 매개변수 사용
             // 1. 경계 확인
             if (col < 0 || col + word.length > size || row < 0 || row >= size) return false;
             
@@ -779,7 +811,7 @@
         }
 
         // 단어를 세로로 배치할 수 있는지 확인하는 함수
-        function canPlaceVertical(grid, word, row, col, size) {
+        function canPlaceVertical(grid, word, row, col, size) { // size 매개변수 사용
             // 1. 경계 확인
             if (row < 0 || row + word.length > size || col < 0 || col >= size) return false;
             
@@ -835,25 +867,42 @@
         }
 
         // 크로스워드를 HTML에 표시하는 함수
-        function displayCrossword(grid, words, size) {
-            const gridContainer = document.getElementById('crosswordGrid');
-            // CSS에 설정된 .grid-container의 max-width에 맞춰 업데이트
-            const gridContainerMaxWidth = 430; // 데스크탑 max-width
-            // 모바일에서는 .crossword-grid의 width: 95vw 또는 max-width: 430px가 적용되므로
-            // 이 값을 기준으로 cellSize를 계산해야 합니다.
-            // 여기서는 고정된 max-width를 사용하므로, 뷰포트에 따라 유연하게 바뀌지 않습니다.
-            // CSS @media 쿼리와 JS 로직을 연동하여 정확한 뷰포트 너비를 기반으로 계산하려면 추가 작업이 필요합니다.
-            // 일단 데스크탑 기준 max-width를 사용하며, 모바일 CSS에서 override 되는 것으로 간주합니다.
-            const cellSize = gridContainerMaxWidth / size; 
+        function displayCrossword(grid, words, size) { // size 매개변수 사용
+            const gridElement = document.getElementById('crosswordGrid'); // 이것이 .crossword-grid 요소입니다.
+            const gridContainerElement = gridElement.parentElement; // 이것이 .grid-container 요소입니다.
+
+            // .crossword-grid의 테두리와 gap을 고려한 실제 사용 가능한 너비 계산
+            const crosswordGridBorderWidth = 2; // CSS .crossword-grid { border: 2px; }
+            const crosswordGridTotalBorderHorizontal = crosswordGridBorderWidth * 2; // 좌우 4px
+
+            const cellGap = 1; // CSS .crossword-grid { gap: 1px; }
+            const totalGapHorizontal = (size - 1) * cellGap; // (칸 개수 - 1) * 간격
+
+            // grid-container의 내부 너비 (패딩은 없으므로 max-width에 가까움)
+            // 모바일에서는 max-width: 95vw가 적용되므로, clientWidth를 사용하여 실제 계산된 너비를 가져옵니다.
+            let availableDisplayWidth = gridContainerElement.clientWidth;
+
+            // 셀들이 차지해야 할 총 너비 = 사용 가능한 공간 - 그리드 자체의 테두리 - 모든 셀 간의 간격
+            let usableWidthForCellsAndGaps = availableDisplayWidth - crosswordGridTotalBorderHorizontal;
+            let usableWidthForCells = usableWidthForCellsAndGaps - totalGapHorizontal;
+
+
+            // 각 셀의 크기 계산 (소수점 이하 버림으로 오버플로우 방지)
+            let cellSize = Math.floor(usableWidthForCells / size);
             
-            gridContainer.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
-            gridContainer.innerHTML = '';
+            // 최소 셀 크기 보장 (매우 작은 화면에서 글자가 너무 작아지지 않도록)
+            if (cellSize < 10) {
+                cellSize = 10;
+            }
+
+            // 계산된 셀 크기를 사용하여 그리드 템플릿 설정
+            gridElement.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
+            gridElement.innerHTML = '';
             
             for (let row = 0; row < size; row++) {
                 for (let col = 0; col < size; col++) {
                     const cell = document.createElement('div');
                     cell.className = 'cell';
-                    // 동적으로 계산된 셀 크기를 적용합니다.
                     cell.style.width = `${cellSize}px`;
                     cell.style.height = `${cellSize}px`;
                     
@@ -861,11 +910,11 @@
                         cell.className += ' black'; // 검은 셀
                     } else { // 글자가 있거나 빈 플레이 가능 셀
                         cell.style.backgroundColor = 'white';
-                        cell.style.border = '0.5px solid #ccc';
+                        cell.style.border = '0.5px solid #ccc'; // 셀 자체 테두리
                         cell.textContent = grid[row][col] === ' ' ? '' : grid[row][col]; // ' ' 이면 빈 칸, 아니면 글자 표시
+                        cell.style.fontSize = `${cellSize * 0.6}px`; // 셀 크기에 비례하여 폰트 크기 조정
                     }
-                    
-                    gridContainer.appendChild(cell);
+                    gridElement.appendChild(cell);
                 }
             }
             
@@ -887,10 +936,10 @@
             showingAnswer = toggleCheckbox.checked; // 체크박스 상태를 따라감
 
             if (showingAnswer) {
-                displayCrossword(answerGrid, currentWords, GRID_SIZE);
+                displayCrossword(answerGrid, currentWords, currentGridSize); // 현재 그리드 크기 사용
                 toggleLabel.textContent = '정답 끄기';
             } else {
-                displayCrossword(currentGrid, currentWords, GRID_SIZE);
+                displayCrossword(currentGrid, currentWords, currentGridSize); // 현재 그리드 크기 사용
                 toggleLabel.textContent = '정답 보기';
             }
         }
@@ -899,8 +948,8 @@
         function revealHintLetterInternal() {
             const emptyPlayableCells = []; // 빈 칸의 좌표를 저장할 배열
 
-            for (let r = 0; r < GRID_SIZE; r++) {
-                for (let c = 0; c < GRID_SIZE; c++) {
+            for (let r = 0; r < currentGridSize; r++) { // 현재 그리드 크기 사용
+                for (let c = 0; c < currentGridSize; c++) { // 현재 그리드 크기 사용
                     // 현재 그리드에서는 빈 칸이면서, 정답 그리드에는 글자가 있는 칸만 선택
                     if (currentGrid[r][c] === ' ' && answerGrid[r][c] !== '') {
                         emptyPlayableCells.push({ row: r, col: c });
@@ -921,7 +970,7 @@
             
             // 현재 퍼즐 뷰를 보고 있을 때만 디스플레이를 업데이트
             if (!showingAnswer) {
-                displayCrossword(currentGrid, currentWords, GRID_SIZE);
+                displayCrossword(currentGrid, currentWords, currentGridSize); // 현재 그리드 크기 사용
             }
         }
 
@@ -935,7 +984,7 @@
             
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const size = GRID_SIZE; // 통일된 그리드 크기 사용
+            const size = currentGridSize; // 선택된 그리드 크기 사용
             
             // PDF에 한글을 지원하려면 한글 폰트를 임베드해야 합니다.
             // 이 예시는 영어에 적합한 기본 폰트를 사용합니다.
@@ -953,7 +1002,7 @@
             // 퍼즐용 빈 그리드 그리기
             const puzzleStartX = 20;
             const puzzleStartY = 45; // Y 위치 조정
-            const puzzleCellSize = 7; // PDF용 셀 크기 조정 (21x21 그리드)
+            const puzzleCellSize = 7; // PDF용 셀 크기 (고정, 선택된 그리드 크기에 따라 전체 너비가 달라짐)
             
             for (let row = 0; row < size; row++) {
                 for (let col = 0; col < size; col++) {
@@ -1010,13 +1059,13 @@
             }
             const answerGridStartX = 20; // 시작 X 위치를 왼쪽으로 이동하여 더 크게 보이게 함
             const answerGridStartY = wordsListStartY + 20;
-            const answerCellSize = 4.0; // 정답 키 셀 크기를 더 키움 (2.5 -> 4.0)
+            const answerCellSize = 4.0; // 정답 키 셀 크기를 더 키움 (고정)
             
             doc.setFontSize(10); // 정답 그리드 제목 글자 크기
             doc.text('Answer:', answerGridStartX, answerGridStartY - 5);
             
             for (let row = 0; row < size; row++) {
-                for (let col = 0; col < size; col++) {
+                for (let col = 0; col <= size; col++) { /* FIXED: Changed =< to <= */
                     const x = answerGridStartX + col * answerCellSize;
                     const y = answerGridStartY + row * answerCellSize;
                     
@@ -1027,7 +1076,7 @@
                         doc.setFillColor(255, 255, 255);
                         doc.rect(x, y, answerCellSize, answerCellSize, 'FD');
                         
-                        doc.setFontSize(5); // 정답 글자를 위한 글꼴 크기 키움 (3.5 -> 5)
+                        doc.setFontSize(5); // 정답 글자를 위한 글꼴 크기 키움
                         doc.text(answerGrid[row][col], x + answerCellSize * 0.25, y + answerCellSize * 0.7); // 셀 중앙에 가깝게 조정
                     }
                 }
@@ -1036,8 +1085,9 @@
             doc.save(`fill-in-crossword-${Date.now()}.pdf`);
         }
 
-        // 페이지 로드 시 첫 번째 크로스워드 생성
+        // 페이지 로드 시 초기 currentGridSize 설정 및 첫 번째 크로스워드 생성
         window.addEventListener('load', () => {
+            currentGridSize = parseInt(document.getElementById('gridSizeSelect').value);
             generateCrossword();
         });
     </script>
